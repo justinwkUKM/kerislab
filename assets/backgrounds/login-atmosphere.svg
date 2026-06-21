@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="title desc">
+  <title id="title">KerisLab login atmosphere</title>
+  <desc id="desc">A bright Apple-inspired login background with subtle aurora gradients and security-grid lines.</desc>
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="1600" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.45" stop-color="#F5F5F7"/>
+      <stop offset="1" stop-color="#EAF6FF"/>
+    </linearGradient>
+    <radialGradient id="blue" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1230 190) rotate(111) scale(560 450)">
+      <stop offset="0" stop-color="#0071E3" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#0071E3" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cyan" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(280 770) rotate(17) scale(560 360)">
+      <stop offset="0" stop-color="#00A7D1" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#00A7D1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="indigo" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(910 700) rotate(80) scale(390 490)">
+      <stop offset="0" stop-color="#5856D6" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#5856D6" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M80 0H0v80" fill="none" stroke="#1D1D1F" stroke-opacity="0.035" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#base)"/>
+  <rect width="1600" height="1000" fill="url(#blue)"/>
+  <rect width="1600" height="1000" fill="url(#cyan)"/>
+  <rect width="1600" height="1000" fill="url(#indigo)"/>
+  <rect width="1600" height="1000" fill="url(#grid)"/>
+  <path d="M184 690c237-134 439-175 604-124 148 45 262 149 430 119 111-20 213-89 308-172" fill="none" stroke="#0071E3" stroke-opacity="0.16" stroke-width="2"/>
+  <path d="M122 763c263-110 485-121 668-35 135 64 259 131 423 79 110-35 203-109 287-203" fill="none" stroke="#00A7D1" stroke-opacity="0.14" stroke-width="2"/>
+</svg>

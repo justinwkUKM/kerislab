@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">LiteLLM router</title>
+  <desc id="desc">Model gateway routing to multiple providers.</desc>
+  <rect x="22" y="22" width="20" height="20" rx="7" fill="#FFFFFF" stroke="#0071E3" stroke-width="2"/>
+  <circle cx="12" cy="16" r="6" fill="#F5F8FF" stroke="#D2D2D7"/>
+  <circle cx="52" cy="16" r="6" fill="#F5F8FF" stroke="#D2D2D7"/>
+  <circle cx="12" cy="48" r="6" fill="#F5F8FF" stroke="#D2D2D7"/>
+  <circle cx="52" cy="48" r="6" fill="#F5F8FF" stroke="#D2D2D7"/>
+  <path d="M22 28 17 21M42 28l5-7M22 36l-5 7M42 36l5 7" stroke="#1D1D1F" stroke-opacity="0.34" stroke-width="2" stroke-linecap="round"/>
+  <path d="M28 32h8M32 28v8" stroke="#00A7D1" stroke-width="2.2" stroke-linecap="round"/>
+</svg>

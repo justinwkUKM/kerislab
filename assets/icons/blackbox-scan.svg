@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Blackbox scan</title>
+  <desc id="desc">A sealed box with scan rays.</desc>
+  <rect x="9" y="13" width="46" height="38" rx="12" fill="#1D1D1F"/>
+  <path d="M18 25h28M18 32h18M18 39h24" stroke="#FFFFFF" stroke-opacity="0.34" stroke-width="2" stroke-linecap="round"/>
+  <path d="M32 7v7M47 11l-4 6M57 25l-7 2M7 25l7 2M17 11l4 6" stroke="#0071E3" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="47" cy="39" r="7" fill="#00A7D1"/>
+  <path d="M51.8 43.8 57 49" stroke="#00A7D1" stroke-width="3" stroke-linecap="round"/>
+</svg>

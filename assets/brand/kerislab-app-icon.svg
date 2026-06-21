@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">KerisLab app icon</title>
+  <desc id="desc">Simplified KerisLab app icon with a clear wavy keris blade, guard, hilt, and shield.</desc>
+  <defs>
+    <linearGradient id="icon-bg" x1="80" y1="48" x2="432" y2="464" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#EAF6FF"/>
+    </linearGradient>
+    <linearGradient id="icon-blade" x1="212" y1="96" x2="300" y2="382" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0071E3"/>
+      <stop offset="0.52" stop-color="#00A7D1"/>
+      <stop offset="1" stop-color="#5856D6"/>
+    </linearGradient>
+    <filter id="icon-shadow" x="-15%" y="-15%" width="130%" height="140%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#1D1D1F" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <rect x="32" y="32" width="448" height="448" rx="108" fill="url(#icon-bg)"/>
+  <rect x="34" y="34" width="444" height="444" rx="106" fill="none" stroke="#FFFFFF" stroke-opacity="0.9" stroke-width="4"/>
+  <path d="M256 84c72 39 136 48 136 48v110c0 105-55 172-136 215-81-43-136-110-136-215V132s64-9 136-48Z" fill="#FFFFFF" fill-opacity="0.72" stroke="#D2D2D7" stroke-width="6" filter="url(#icon-shadow)"/>
+  <path d="M256 112c37 55 33 88 11 128-19 34-16 62 7 95 18 27 17 51-7 78h-22c-24-27-25-51-7-78 23-33 26-61 7-95-22-40-26-73 11-128Z" fill="url(#icon-blade)"/>
+  <path d="M256 132c-19 40-11 70 8 104 17 31 14 63-8 95" fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" opacity="0.84"/>
+  <path d="M174 358c34-26 62-37 82-37s48 11 82 37c-31 14-58 21-82 21s-51-7-82-21Z" fill="#1D1D1F"/>
+  <path d="M218 382h76v34c0 28-16 51-38 66-22-15-38-38-38-66v-34Z" fill="#1D1D1F"/>
+  <path d="M219 382h74" stroke="#FFFFFF" stroke-opacity="0.36" stroke-width="9" stroke-linecap="round"/>
+</svg>

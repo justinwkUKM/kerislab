@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="title desc">
+  <title id="title">KerisLab Mission Control grid</title>
+  <desc id="desc">Subtle technical workspace background with precision grid, scan paths, and soft blue accents.</desc>
+  <defs>
+    <linearGradient id="mc-base" x1="0" y1="0" x2="1600" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F5F5F7"/>
+    </linearGradient>
+    <pattern id="mc-grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0H0v64" fill="none" stroke="#1D1D1F" stroke-opacity="0.045"/>
+      <path d="M32 0v64M0 32h64" fill="none" stroke="#1D1D1F" stroke-opacity="0.022"/>
+    </pattern>
+    <radialGradient id="mc-glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1255 260) rotate(90) scale(440)">
+      <stop offset="0" stop-color="#0071E3" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#0071E3" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#mc-base)"/>
+  <rect width="1600" height="1000" fill="url(#mc-grid)"/>
+  <rect width="1600" height="1000" fill="url(#mc-glow)"/>
+  <path d="M210 688h188c50 0 74-29 107-63l78-80c37-38 68-54 123-54h188c57 0 91-18 129-60l82-91c35-39 69-55 123-55h205" fill="none" stroke="#0071E3" stroke-opacity="0.18" stroke-width="3" stroke-linecap="round"/>
+  <path d="M250 748h256c54 0 85-16 121-55l109-118c33-36 63-52 113-52h182c59 0 91 24 128 69l78 94c35 42 67 62 122 62h78" fill="none" stroke="#00A7D1" stroke-opacity="0.14" stroke-width="3" stroke-linecap="round"/>
+  <g fill="#FFFFFF" stroke="#D2D2D7">
+    <circle cx="398" cy="688" r="9"/>
+    <circle cx="706" cy="491" r="9"/>
+    <circle cx="1023" cy="431" r="9"/>
+    <circle cx="1237" cy="686" r="9"/>
+  </g>
+  <g fill="#0071E3">
+    <circle cx="398" cy="688" r="4"/>
+    <circle cx="1023" cy="431" r="4"/>
+  </g>
+  <g fill="#00A7D1">
+    <circle cx="706" cy="491" r="4"/>
+    <circle cx="1237" cy="686" r="4"/>
+  </g>
+</svg>

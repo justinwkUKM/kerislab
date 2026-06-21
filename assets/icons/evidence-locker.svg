@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Evidence locker</title>
+  <desc id="desc">Evidence vault with immutable record lines.</desc>
+  <rect x="10" y="16" width="44" height="36" rx="10" fill="#FFFFFF" stroke="#D2D2D7"/>
+  <path d="M22 16v-2c0-5.5 4.5-10 10-10s10 4.5 10 10v2" fill="none" stroke="#1D1D1F" stroke-opacity="0.42" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="32" cy="34" r="6" fill="#F5F8FF" stroke="#0071E3" stroke-width="2"/>
+  <path d="M32 39v5" stroke="#0071E3" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M18 25h8M38 25h8M18 47h28" stroke="#6E6E73" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round"/>
+</svg>

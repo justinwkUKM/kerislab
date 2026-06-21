@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Identity and SSO</title>
+  <desc id="desc">User identity connected to trusted access controls.</desc>
+  <rect x="8" y="10" width="48" height="44" rx="14" fill="#FFFFFF" stroke="#D2D2D7"/>
+  <circle cx="25" cy="28" r="7" fill="#F5F8FF" stroke="#0071E3" stroke-width="2"/>
+  <path d="M14 46c2.5-7 6.2-10 11-10s8.5 3 11 10" fill="none" stroke="#0071E3" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M42 24c4.8 2.6 9.1 3.2 9.1 3.2v7.1c0 7-3.7 11.4-9.1 14.3-5.4-2.9-9.1-7.3-9.1-14.3v-7.1S37.2 26.6 42 24Z" fill="#F5F8FF" stroke="#D2D2D7"/>
+  <path d="m38.5 36.2 2.4 2.5 4.7-5.3" fill="none" stroke="#34C759" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

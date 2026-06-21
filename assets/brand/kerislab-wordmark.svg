@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 96" role="img" aria-labelledby="title desc">
+  <title id="title">KerisLab wordmark</title>
+  <desc id="desc">Simplified KerisLab logo lockup with keris shield mark and wordmark.</desc>
+  <defs>
+    <linearGradient id="wm-bg" x1="16" y1="10" x2="80" y2="86" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#EAF6FF"/>
+    </linearGradient>
+    <linearGradient id="wm-blade" x1="38" y1="16" x2="58" y2="68" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0071E3"/>
+      <stop offset="0.55" stop-color="#00A7D1"/>
+      <stop offset="1" stop-color="#5856D6"/>
+    </linearGradient>
+    <filter id="wm-shadow" x="-20%" y="-20%" width="140%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#1D1D1F" flood-opacity="0.11"/>
+    </filter>
+  </defs>
+  <g transform="translate(8 8)">
+    <rect width="80" height="80" rx="22" fill="url(#wm-bg)" filter="url(#wm-shadow)"/>
+    <rect x=".5" y=".5" width="79" height="79" rx="21.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.9"/>
+    <path d="M40 9c12 6.5 22 7.8 22 7.8v17.7C62 51 53.2 62 40 69c-13.2-7-22-18-22-34.5V16.8S28 15.5 40 9Z" fill="#FFFFFF" fill-opacity="0.72" stroke="#D2D2D7"/>
+    <path d="M40 14c6.6 9.7 5.8 15.5 2 22.4-3.2 5.9-2.8 11 1.3 16.9 3.2 4.7 2.8 9.2-1.3 13.7h-4c-4.1-4.5-4.5-9-1.3-13.7 4.1-5.9 4.5-11 1.3-16.9-3.8-6.9-4.6-12.7 2-22.4Z" fill="url(#wm-blade)"/>
+    <path d="M40 19c-3.3 7-2.1 12.8 1.2 18.8 2.9 5.2 2.5 10.8-1.2 16.2" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" opacity="0.82"/>
+    <path d="M25 58c6-4.5 10.9-6.4 15-6.4S49 53.5 55 58c-5.7 2.5-10.7 3.7-15 3.7S30.7 60.5 25 58Z" fill="#1D1D1F"/>
+    <path d="M33 62h14v7.4c0 4.8-2.9 8.4-7 10.6-4.1-2.2-7-5.8-7-10.6V62Z" fill="#1D1D1F"/>
+  </g>
+  <text x="112" y="57" fill="#1D1D1F" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif" font-size="42" font-weight="650" letter-spacing="0">KerisLab</text>
+  <text x="115" y="76" fill="#6E6E73" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif" font-size="13" font-weight="500" letter-spacing="1.2">AUTONOMOUS SECURITY TESTING</text>
+</svg>

@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1200" role="img" aria-labelledby="title desc">
+  <title id="title">KerisLab asset contact sheet</title>
+  <desc id="desc">Overview sheet for the KerisLab brand assets, backgrounds, icons, and illustration style.</desc>
+  <defs>
+    <linearGradient id="sheet-bg" x1="0" y1="0" x2="1600" y2="1200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F5F5F7"/>
+    </linearGradient>
+    <linearGradient id="sheet-accent" x1="300" y1="170" x2="920" y2="730" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0071E3"/>
+      <stop offset="0.52" stop-color="#00A7D1"/>
+      <stop offset="1" stop-color="#5856D6"/>
+    </linearGradient>
+    <filter id="sheet-shadow" x="-10%" y="-10%" width="120%" height="130%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="16" stdDeviation="22" flood-color="#1D1D1F" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="1200" fill="url(#sheet-bg)"/>
+  <text x="80" y="96" fill="#1D1D1F" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif" font-size="46" font-weight="650">KerisLab Asset System</text>
+  <text x="82" y="136" fill="#6E6E73" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif" font-size="18">Professional source assets for brand, product UI, backgrounds, and feature storytelling.</text>
+
+  <rect x="80" y="188" width="420" height="250" rx="28" fill="#FFFFFF" stroke="#D2D2D7" filter="url(#sheet-shadow)"/>
+  <text x="112" y="236" fill="#1D1D1F" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif" font-size="20" font-weight="650">Brand Mark</text>
+  <rect x="112" y="270" width="112" height="112" rx="30" fill="#F5F8FF" stroke="#D2D2D7"/>
+  <path d="M168 290c16.5 8.9 31.2 11.1 31.2 11.1v24.4c0 23.7-12.6 38.6-31.2 48.5-18.6-9.9-31.2-24.8-31.2-48.5v-24.4S151.5 298.9 168 290Z" fill="#FFFFFF" fill-opacity="0.74" stroke="#D2D2D7"/>
+  <path d="M170.7 296.3c-6.6 11.5-12.3 21.6-10.4 34.2 1 6.2 4.2 12.5 4.2 18.6 0 5.3-2.2 10.1-6.3 14.7 10.4-2.8 18.5-8.8 22.4-17.9 3.1-7.4 1.8-15.3-.1-23.5-1.8-8.3-2.7-16-9.8-26.1Z" fill="url(#sheet-accent)"/>
+  <text x="252" y="318" fill="#1D1D1F" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif" font-size="34" font-weight="650">KerisLab</text>
+  <text x="254" y="348" fill="#6E6E73" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif" font-size="13" font-weight="600" letter-spacing="1.1">AUTONOMOUS SECURITY</text>
+
+  <rect x="540" y="188" width="980" height="250" rx="28" fill="#FFFFFF" stroke="#D2D2D7" filter="url(#sheet-shadow)"/>
+  <text x="572" y="236" fill="#1D1D1F" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif" font-size="20" font-weight="650">Feature Icons</text>
+  <g transform="translate(580 276)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g>
+      <rect width="80" height="80" rx="20" fill="#FFFFFF" stroke="#D2D2D7"/>
+      <path d="M40 18c7 3.8 13.2 4.7 13.2 4.7v10.2c0 10-5.3 16.3-13.2 20.5-7.9-4.2-13.2-10.5-13.2-20.5V22.7S33 21.8 40 18Z" fill="#F5F8FF" stroke="#D2D2D7"/>
+      <path d="M41.1 21c-2.8 4.8-5.2 9.1-4.4 14.4.4 2.6 1.8 5.3 1.8 7.9 0 2.2-.9 4.3-2.6 6.2 4.3-1.2 7.8-3.7 9.4-7.6 1.3-3.1.8-6.4 0-9.9-.8-3.5-1.2-6.7-4.2-11Z" fill="url(#sheet-accent)" stroke="none"/>
+    </g>
+    <g transform="translate(112)">
+      <rect width="80" height="80" rx="20" fill="#1D1D1F"/>
+      <circle cx="55" cy="54" r="8" fill="#00A7D1" stroke="none"/>
+      <path d="M22 30h36M22 40h24M22 50h30" stroke="#FFFFFF" stroke-opacity="0.34" stroke-width="2"/>
+    </g>
+    <g transform="translate(224)">
+      <rect width="80" height="80" rx="20" fill="#FFFFFF" stroke="#D2D2D7"/>
+      <path d="M28 34 22 40l6 6M52 34l6 6-6 6M44 30l-8 20" stroke="#0071E3" stroke-width="3"/>
+    </g>
+    <g transform="translate(336)">
+      <rect width="80" height="80" rx="20" fill="#FFFFFF" stroke="#D2D2D7"/>
+      <path d="m28 42 8 8 18-20" stroke="#34C759" stroke-width="4"/>
+      <path d="M40 18c12 6.5 22 7 22 7v14c0 16-8 25-22 33-14-8-22-17-22-33V25s10-.5 22-7Z" stroke="#D2D2D7"/>
+    </g>
+    <g transform="translate(448)">
+      <rect width="80" height="80" rx="20" fill="#FFFFFF" stroke="#D2D2D7"/>
+      <circle cx="40" cy="40" r="18" fill="#F5F8FF" stroke="#FFCC00" stroke-width="3"/>
+      <path d="M46 32a9 9 0 1 0 0 16" stroke="#1D1D1F" stroke-width="3"/>
+    </g>
+    <g transform="translate(560)">
+      <rect width="80" height="80" rx="20" fill="#FFFFFF" stroke="#D2D2D7"/>
+      <circle cx="40" cy="40" r="15" fill="#F5F8FF" stroke="#0071E3" stroke-width="3"/>
+      <path d="M40 55v8" stroke="#0071E3" stroke-width="3"/>
+    </g>
+    <g transform="translate(672)">
+      <rect width="80" height="80" rx="20" fill="#FFFFFF" stroke="#D2D2D7"/>
+      <rect x="28" y="28" width="24" height="24" rx="8" stroke="#0071E3" stroke-width="3"/>
+      <path d="M28 40H16M52 40h12M40 28V16M40 52v12" stroke="#1D1D1F" stroke-opacity="0.34" stroke-width="3"/>
+    </g>
+    <g transform="translate(784)">
+      <rect width="80" height="80" rx="20" fill="#FFFFFF" stroke="#D2D2D7"/>
+      <path d="M28 22h20l10 10v26H28Z" fill="#F5F8FF" stroke="#D2D2D7"/>
+      <path d="M38 46h18M50 38l8 8-8 8" stroke="#0071E3" stroke-width="3"/>
+    </g>
+  </g>
+
+  <rect x="80" y="492" width="1440" height="260" rx="28" fill="#FFFFFF" stroke="#D2D2D7" filter="url(#sheet-shadow)"/>
+  <text x="112" y="540" fill="#1D1D1F" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif" font-size="20" font-weight="650">Background Language</text>
+  <rect x="112" y="572" width="410" height="130" rx="22" fill="#F5F5F7"/>
+  <circle cx="430" cy="598" r="130" fill="#0071E3" fill-opacity="0.18"/>
+  <circle cx="194" cy="702" r="126" fill="#00A7D1" fill-opacity="0.16"/>
+  <rect x="560" y="572" width="410" height="130" rx="22" fill="#F5F5F7"/>
+  <path d="M560 655c82-18 153-17 213 4 78 27 129 60 213 30" fill="none" stroke="#0071E3" stroke-opacity="0.32" stroke-width="3"/>
+  <circle cx="860" cy="606" r="120" fill="#34C759" fill-opacity="0.1"/>
+  <rect x="1008" y="572" width="410" height="130" rx="22" fill="#FFFFFF" stroke="#D2D2D7"/>
+  <path d="M1008 612h410M1008 652h410M1048 572v130M1088 572v130M1128 572v130M1168 572v130M1208 572v130M1248 572v130M1288 572v130M1328 572v130M1368 572v130" stroke="#1D1D1F" stroke-opacity="0.05"/>
+  <path d="M1040 662c90-62 151-77 221-44 43 20 91 65 138 26" fill="none" stroke="#00A7D1" stroke-opacity="0.3" stroke-width="4"/>
+
+  <rect x="80" y="806" width="1440" height="300" rx="28" fill="#FFFFFF" stroke="#D2D2D7" filter="url(#sheet-shadow)"/>
+  <text x="112" y="854" fill="#1D1D1F" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif" font-size="20" font-weight="650">Mission Control Illustration</text>
+  <rect x="180" y="890" width="1240" height="166" rx="28" fill="#F8F8FA" stroke="#D2D2D7"/>
+  <rect x="210" y="918" width="210" height="110" rx="18" fill="#FFFFFF" stroke="#D2D2D7"/>
+  <rect x="448" y="918" width="430" height="110" rx="18" fill="#FFFFFF" stroke="#D2D2D7"/>
+  <rect x="906" y="918" width="484" height="110" rx="18" fill="#FFFFFF" stroke="#D2D2D7"/>
+  <path d="M244 952h110M244 978h80M244 1004h122" stroke="#6E6E73" stroke-opacity="0.3" stroke-width="9" stroke-linecap="round"/>
+  <path d="M490 994c79-54 143-70 205-47 47 17 86 48 137 25" fill="none" stroke="url(#sheet-accent)" stroke-width="7" stroke-linecap="round"/>
+  <rect x="940" y="948" width="140" height="14" rx="7" fill="#1D1D1F" fill-opacity="0.16"/>
+  <rect x="940" y="982" width="190" height="14" rx="7" fill="#1D1D1F" fill-opacity="0.12"/>
+  <circle cx="1346" cy="966" r="13" fill="#34C759"/>
+  <circle cx="1346" cy="1002" r="13" fill="#FFCC00"/>
+</svg>

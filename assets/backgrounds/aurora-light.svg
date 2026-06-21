@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="title desc">
+  <title id="title">KerisLab aurora light background</title>
+  <desc id="desc">Soft light background for dashboards and settings with controlled aurora gradients.</desc>
+  <defs>
+    <linearGradient id="al-base" x1="0" y1="0" x2="1600" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F5F5F7"/>
+      <stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <radialGradient id="al-cyan" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1240 110) rotate(130) scale(680 420)">
+      <stop offset="0" stop-color="#00A7D1" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#00A7D1" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="al-blue" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(420 330) rotate(22) scale(520 360)">
+      <stop offset="0" stop-color="#0071E3" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#0071E3" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="al-green" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1030 880) rotate(45) scale(520 300)">
+      <stop offset="0" stop-color="#34C759" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#34C759" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#al-base)"/>
+  <rect width="1600" height="1000" fill="url(#al-cyan)"/>
+  <rect width="1600" height="1000" fill="url(#al-blue)"/>
+  <rect width="1600" height="1000" fill="url(#al-green)"/>
+  <path d="M0 780c185-39 336-37 454 4 171 59 275 122 449 66 148-48 262-158 430-186 106-18 195-4 267 42v294H0V780Z" fill="#FFFFFF" fill-opacity="0.42"/>
+</svg>
