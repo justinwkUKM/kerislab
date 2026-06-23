@@ -1,5 +1,5 @@
-export type AuthProvider = "google" | "sso";
-export type ScanType = "passive_blackbox" | "autonomous_blackbox" | "whitebox_review";
+export type AuthProvider = "google" | "sso" | "development";
+export type ScanType = "passive_blackbox" | "active_blackbox" | "autonomous_blackbox" | "whitebox" | "hybrid";
 
 export type User = {
   id: string;
@@ -20,7 +20,7 @@ export type UserSettings = {
 export type Workspace = {
   id: string;
   name: string;
-  owner_user_id: string;
+  allowed_domains?: string[];
 };
 
 export type CreditAccount = {
@@ -28,6 +28,16 @@ export type CreditAccount = {
   available: number;
   reserved: number;
   consumed: number;
+};
+
+export type LedgerEntry = {
+  id: string;
+  workspace_id: string;
+  entry_type: string;
+  amount: number;
+  balance_after: number;
+  note: string;
+  created_at?: string;
 };
 
 export type Project = {
@@ -53,14 +63,22 @@ export type Scan = {
   status: string;
   model_profile_id: string;
   instructions: string;
+  created_at?: string;
+  completed_at?: string | null;
 };
 
 export type Approval = {
   id: string;
+  workspace_id: string;
   scan_id: string;
   status: string;
-  title: string;
-  requested_action: string;
+  risk_category: string;
+  target: string;
+  proposed_tool: string;
+  proposed_action: string;
+  reason: string;
+  expected_evidence: string;
+  policy_reason: string;
 };
 
 export type BrowserAction = {
@@ -85,6 +103,8 @@ export type ScanEvent = {
   scan_id: string;
   type: string;
   summary: string;
+  payload?: Record<string, unknown>;
+  created_at?: string;
 };
 
 export type Finding = {
@@ -92,8 +112,20 @@ export type Finding = {
   scan_id: string;
   severity: string;
   title: string;
-  asset: string;
+  affected_asset: string;
   status: string;
+  verification_status: string;
+  evidence_refs: string[];
+};
+
+export type EvidenceArtifact = {
+  id: string;
+  scan_id: string;
+  artifact_type: string;
+  uri: string;
+  summary: string;
+  content_type: string;
+  metadata: Record<string, unknown>;
 };
 
 export type ModelProfile = {
@@ -104,25 +136,59 @@ export type ModelProfile = {
   api_base: string;
 };
 
-export type LedgerEntry = {
+export type Report = {
   id: string;
   workspace_id: string;
-  entry_type: string;
-  amount: number;
-  note: string;
+  project_id: string;
+  scan_id: string;
+  title: string;
+  format: string;
+  content: Record<string, unknown>;
+  created_at?: string;
+};
+
+export type HealthComponents = {
+  status: string;
+  worker_heartbeat: {
+    status: string;
+    active: number;
+    total: number;
+    workers: Array<{
+      id: string;
+      name: string;
+      queue_name: string;
+      processed_jobs: number;
+      last_seen_at: string;
+      status: string;
+    }>;
+  };
+  queue: {
+    queued: number;
+    running: number;
+    failed: number;
+  };
 };
 
 type RequestOptions = {
   method?: "GET" | "POST" | "PATCH";
   body?: unknown;
+  token?: string;
   userId?: string;
 };
 
 export class KerisLabApi {
   constructor(private readonly baseUrl = import.meta.env.VITE_API_BASE_URL ?? "") {}
 
-  async devLogin() {
-    return this.request<{ user: User; session_header: { "X-KerisLab-User": string } }>("/api/auth/dev-login", {
+  googleLogin() {
+    return this.request<{ authorization_url: string }>("/api/auth/google/login");
+  }
+
+  ssoLogin() {
+    return this.request<{ authorization_url: string }>("/api/auth/sso/login");
+  }
+
+  devLogin() {
+    return this.request<{ user: User; access_token: string; settings?: UserSettings }>("/api/auth/dev-login", {
       method: "POST",
       body: {
         email: "owner@kerislab.local",
@@ -132,121 +198,167 @@ export class KerisLabApi {
     });
   }
 
-  async me(userId: string) {
-    return this.request<{ user: User; settings: UserSettings; memberships: unknown[] }>("/api/auth/me", { userId });
+  me(token: string) {
+    return this.request<{ user: User; settings: UserSettings; memberships: unknown[] }>("/api/auth/me", { token });
   }
 
-  async updateSettings(userId: string, body: Partial<UserSettings>) {
-    return this.request<{ settings: UserSettings }>("/api/users/me", { method: "PATCH", userId, body });
+  health() {
+    return this.request<{ status: string; service: string }>("/api/health");
   }
 
-  async createWorkspace(userId: string) {
+  healthComponents() {
+    return this.request<HealthComponents>("/api/health/components");
+  }
+
+  updateSettings(token: string, body: Partial<UserSettings>) {
+    return this.request<{ settings: UserSettings }>("/api/users/me", { method: "PATCH", token, body });
+  }
+
+  listWorkspaces(token: string) {
+    return this.request<{ workspaces: Workspace[] }>("/api/workspaces", { token });
+  }
+
+  createWorkspace(token: string, name = "KerisLab Lab", initialCredits = 5) {
     return this.request<{ workspace: Workspace; credits: CreditAccount }>("/api/workspaces", {
       method: "POST",
-      userId,
-      body: { name: "KerisLab Lab", initial_credits: 5 }
+      token,
+      body: { name, initial_credits: initialCredits }
     });
   }
 
-  async createProject(userId: string, workspaceId: string) {
+  credits(token: string, workspaceId: string) {
+    return this.request<{ credits: CreditAccount }>(`/api/workspaces/${workspaceId}/credits`, { token });
+  }
+
+  ledger(token: string, workspaceId: string) {
+    return this.request<{ entries: LedgerEntry[] }>(`/api/workspaces/${workspaceId}/credit-ledger`, { token });
+  }
+
+  createProject(token: string, workspaceId: string, name = "Autonomous Web Assessment") {
     return this.request<{ project: Project }>("/api/projects", {
       method: "POST",
-      userId,
-      body: { workspace_id: workspaceId, name: "Autonomous Web Assessment" }
+      token,
+      body: { workspace_id: workspaceId, name }
     });
   }
 
-  async createTarget(userId: string, workspaceId: string, projectId: string) {
+  createTarget(token: string, workspaceId: string, projectId: string, url: string, name = "Primary Web App") {
     return this.request<{ target: Target }>("/api/targets", {
       method: "POST",
-      userId,
-      body: {
-        workspace_id: workspaceId,
-        project_id: projectId,
-        name: "Example Web App",
-        url: "https://example.com"
-      }
+      token,
+      body: { workspace_id: workspaceId, project_id: projectId, name, url }
     });
   }
 
-  async createModelProfile(userId: string, workspaceId: string) {
+  createModelProfile(token: string, workspaceId: string) {
     return this.request<{ profile: ModelProfile }>("/api/settings/llm/profiles", {
       method: "POST",
-      userId,
+      token,
       body: {
         workspace_id: workspaceId,
         name: "Default LiteLLM",
         model: "openai/gpt-4o-mini",
-        api_base: "http://localhost:4000"
+        api_base: "http://litellm:4000"
       }
     });
   }
 
-  async testModelProfile(userId: string, profileId: string) {
-    return this.request<{ ok: boolean; profile_id: string; model: string; route: string }>(
-      `/api/settings/llm/profiles/${profileId}/test`,
-      { method: "POST", userId }
-    );
-  }
-
-  async createScan(userId: string, workspaceId: string, projectId: string, targetId: string, profileId: string) {
+  createScan(
+    token: string,
+    payload: {
+      workspace_id: string;
+      project_id: string;
+      target_id: string;
+      scan_type: ScanType;
+      model_profile_id: string;
+      instructions: string;
+    }
+  ) {
     return this.request<{ scan: Scan; credits: CreditAccount }>("/api/scans", {
       method: "POST",
-      userId,
-      body: {
-        workspace_id: workspaceId,
-        project_id: projectId,
-        target_id: targetId,
-        scan_type: "autonomous_blackbox",
-        model_profile_id: profileId,
-        instructions: "Focus on auth, upload handling, and UI-driven crawl paths."
-      }
+      token,
+      body: payload
     });
   }
 
-  async startAutonomous(userId: string, scanId: string) {
+  startAutonomous(token: string, scanId: string) {
     return this.request<{ scan: Scan; plan: { current_phase: string; phases: string[] } }>(
       `/api/scans/${scanId}/start-autonomous`,
-      { method: "POST", userId }
+      { method: "POST", token }
     );
   }
 
-  async browserPlan(userId: string, scanId: string) {
-    return this.request<{ browser_plan: BrowserPlan }>(`/api/scans/${scanId}/browser-plan`, { userId });
+  browserPlan(token: string, scanId: string) {
+    return this.request<{ browser_plan: BrowserPlan }>(`/api/scans/${scanId}/browser-plan`, { token });
   }
 
-  async requestUploadApproval(userId: string, scanId: string) {
+  executeBrowserPlan(token: string, scanId: string) {
+    return this.request<{ execution_id: string; evidence_refs?: string[] }>(`/api/scans/${scanId}/browser-plan/execute`, {
+      method: "POST",
+      token
+    });
+  }
+
+  requestUploadApproval(token: string, scanId: string) {
     return this.request<{ approval: Approval; scan: Scan }>(
       `/api/scans/${scanId}/approvals/request-upload-verification`,
-      { method: "POST", userId }
+      { method: "POST", token }
     );
   }
 
-  async approve(userId: string, approvalId: string) {
+  approvals(token: string, scanId: string) {
+    return this.request<{ approvals: Approval[] }>(`/api/scans/${scanId}/approvals`, { token });
+  }
+
+  approve(token: string, approvalId: string, note = "Approved from Mission Control") {
     return this.request<{ approval: Approval }>(`/api/approvals/${approvalId}/approve`, {
       method: "POST",
-      userId,
-      body: { note: "Approved from Mission Control" }
+      token,
+      body: { note }
     });
   }
 
-  async completeScan(userId: string, scanId: string) {
+  reject(token: string, approvalId: string, note = "Rejected from Mission Control") {
+    return this.request<{ approval: Approval }>(`/api/approvals/${approvalId}/reject`, {
+      method: "POST",
+      token,
+      body: { note }
+    });
+  }
+
+  completeScan(token: string, scanId: string) {
     return this.request<{ scan: Scan; credits: CreditAccount }>(`/api/scans/${scanId}/complete`, {
       method: "POST",
-      userId
+      token
     });
   }
 
-  async events(userId: string, scanId: string) {
-    return this.request<{ events: ScanEvent[] }>(`/api/scans/${scanId}/events`, { userId });
+  events(token: string, scanId: string) {
+    return this.request<{ events: ScanEvent[] }>(`/api/scans/${scanId}/events`, { token });
   }
 
-  async findings(userId: string, scanId: string) {
-    return this.request<{ findings: Finding[] }>(`/api/findings?scan_id=${scanId}`, { userId });
+  findings(token: string, scanId?: string) {
+    return this.request<{ findings: Finding[] }>(`/api/findings${scanId ? `?scan_id=${scanId}` : ""}`, { token });
   }
 
-  async ledger(userId: string, workspaceId: string) {
-    return this.request<{ entries: LedgerEntry[] }>(`/api/workspaces/${workspaceId}/credit-ledger`, { userId });
+  evidence(token: string, scanId: string) {
+    return this.request<{ evidence: EvidenceArtifact[] }>(`/api/scans/${scanId}/evidence`, { token });
+  }
+
+  executionJobs(token: string) {
+    return this.request<{ jobs: unknown[]; pending: unknown[] }>("/api/execution/jobs", { token });
+  }
+
+  createReport(token: string, scanId: string, format = "json") {
+    return this.request<{ report: Report }>("/api/reports", {
+      method: "POST",
+      token,
+      body: { scan_id: scanId, format }
+    });
+  }
+
+  reportDownloadUrl(reportId: string) {
+    return `${this.baseUrl}/api/reports/${reportId}/download`;
   }
 
   private async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
@@ -254,6 +366,7 @@ export class KerisLabApi {
       method: options.method ?? "GET",
       headers: {
         "Content-Type": "application/json",
+        ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
         ...(options.userId ? { "X-KerisLab-User": options.userId } : {})
       },
       body: options.body ? JSON.stringify(options.body) : undefined
@@ -270,60 +383,49 @@ export class KerisLabApi {
 
 export type MissionState = {
   user?: User;
+  token?: string;
   settings?: UserSettings;
   workspace?: Workspace;
   credits?: CreditAccount;
   project?: Project;
   target?: Target;
   profile?: ModelProfile;
-  profileTest?: string;
   browserPlan?: BrowserPlan;
   scan?: Scan;
   approval?: Approval;
+  approvals: Approval[];
   events: ScanEvent[];
   findings: Finding[];
+  evidence: EvidenceArtifact[];
   ledger: LedgerEntry[];
+  health?: HealthComponents;
 };
 
-export async function runMvpWorkflow(api = new KerisLabApi()): Promise<MissionState> {
+export async function bootstrapDemoWorkspace(api = new KerisLabApi()): Promise<MissionState> {
   const login = await api.devLogin();
-  const userId = login.user.id;
-  const workspace = await api.createWorkspace(userId);
-  const project = await api.createProject(userId, workspace.workspace.id);
-  const target = await api.createTarget(userId, workspace.workspace.id, project.project.id);
-  const profile = await api.createModelProfile(userId, workspace.workspace.id);
-  const profileTest = await api.testModelProfile(userId, profile.profile.id);
-  const createdScan = await api.createScan(
-    userId,
-    workspace.workspace.id,
-    project.project.id,
-    target.target.id,
-    profile.profile.id
-  );
-  const started = await api.startAutonomous(userId, createdScan.scan.id);
-  const browserPlan = await api.browserPlan(userId, started.scan.id);
-  const approval = await api.requestUploadApproval(userId, started.scan.id);
-  const approved = await api.approve(userId, approval.approval.id);
-  const completed = await api.completeScan(userId, approval.scan.id);
-  const settings = await api.updateSettings(userId, { theme: "light", timezone: "Asia/Kuala_Lumpur" });
-  const events = await api.events(userId, completed.scan.id);
-  const findings = await api.findings(userId, completed.scan.id);
-  const ledger = await api.ledger(userId, workspace.workspace.id);
+  const token = login.access_token;
+  const workspace = await api.createWorkspace(token);
+  const project = await api.createProject(token, workspace.workspace.id);
+  const target = await api.createTarget(token, workspace.workspace.id, project.project.id, "https://example.com");
+  const profile = await api.createModelProfile(token, workspace.workspace.id);
+  const settings = await api.updateSettings(token, { theme: "light", timezone: "Asia/Kuala_Lumpur" });
+  const ledger = await api.ledger(token, workspace.workspace.id);
+  const health = await api.healthComponents();
 
   return {
     user: login.user,
+    token,
     settings: settings.settings,
     workspace: workspace.workspace,
-    credits: completed.credits,
+    credits: workspace.credits,
     project: project.project,
     target: target.target,
     profile: profile.profile,
-    profileTest: `${profileTest.model} via ${profileTest.route}`,
-    browserPlan: browserPlan.browser_plan,
-    scan: completed.scan,
-    approval: approved.approval,
-    events: events.events,
-    findings: findings.findings,
-    ledger: ledger.entries
+    approvals: [],
+    events: [],
+    findings: [],
+    evidence: [],
+    ledger: ledger.entries,
+    health
   };
 }
