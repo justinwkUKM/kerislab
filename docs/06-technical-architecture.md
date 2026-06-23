@@ -29,7 +29,7 @@ Web:
 API:
 
 - FastAPI.
-- Google OAuth, enterprise SSO, sessions, profile/settings, workspace membership, credits, projects, targets, scans, findings, reports, settings, audit logs.
+- Google OAuth, enterprise SSO, one-time OAuth state records, userinfo/id-token profile resolution, id-token nonce/audience/issuer validation, allowed-domain workspace auto-join, sessions, profile/settings, workspace membership, credits, projects, targets, scans, findings, reports, settings, audit logs.
 - Creates scan jobs and reads persisted scan state.
 - Streams scan events.
 
@@ -49,6 +49,16 @@ LiteLLM:
 PostgreSQL:
 
 - System of record for projects, scans, findings, events, policies, approvals, and audit.
+- Preferred production database when `KERISLAB_DATABASE_URL` is configured.
+- Normalized schema migrations are applied during API store initialization and can also be run explicitly with `make migrate`.
+- If the configured PostgreSQL connection cannot be opened, the API falls back to SQLite so local startup is not blocked by database availability.
+
+SQLite:
+
+- Local fallback database for single-node development and offline MVP runs.
+- Stores the same serialized platform state as PostgreSQL when no Postgres URL is available or the Postgres connection fails.
+- Normalized schema migrations are applied before the SQLite-backed store opens.
+- If SQLite cannot be initialized, the API falls back to in-memory storage for emergency development and test runs.
 
 Object Storage:
 
@@ -62,14 +72,20 @@ Object Storage:
 - `users`
 - `user_profiles`
 - `user_settings`
+- `user_sessions`
+- `oauth_states`
 - `auth_identities`
-- `sessions`
 - `workspaces`
 - `workspace_memberships`
 - `sso_configurations`
 - `workspace_credit_accounts`
 - `credit_ledger_entries`
 - `scan_credit_reservations`
+- `billing_customers`
+- `billing_checkout_sessions`
+- `billing_invoices`
+- `billing_payments`
+- `billing_webhook_events`
 - `targets`
 - `target_scope_rules`
 - `scan_policies`
@@ -77,13 +93,15 @@ Object Storage:
 - `scan_phases`
 - `scan_events`
 - `agent_plans`
+- `browser_plans`
+- `browser_executions`
+- `evidence_artifacts`
 - `agent_memory`
 - `approval_requests`
 - `tool_runs`
 - `llm_calls`
 - `browser_sessions`
 - `findings`
-- `finding_evidence`
 - `reports`
 - `audit_logs`
 
@@ -106,6 +124,9 @@ Workspaces:
 - `PATCH /api/workspaces/{workspace_id}/sso`
 - `GET /api/workspaces/{workspace_id}/credits`
 - `GET /api/workspaces/{workspace_id}/credit-ledger`
+- `POST /api/workspaces/{workspace_id}/billing/checkout-sessions`
+- `POST /api/billing/checkout-sessions/{checkout_session_id}/confirm`
+- `POST /api/billing/webhooks`
 
 Projects and targets:
 
@@ -123,6 +144,7 @@ Scans:
 - `POST /api/scans/{scan_id}/resume`
 - `POST /api/scans/{scan_id}/cancel`
 - `POST /api/scans/{scan_id}/instructions`
+- `GET /api/scans/{scan_id}/evidence`
 
 Approvals:
 
@@ -181,6 +203,9 @@ Credit behavior:
 - Release the reserved credit when scan status becomes `failed`, `cancelled`, or `blocked`.
 - Keep the reservation while status is `queued`, `running`, `paused`, or `awaiting_approval`.
 - Record every credit state change in the immutable credit ledger.
+- Confirmed billing checkout sessions create invoice and payment records, then grant purchased credits through the same immutable credit ledger.
+- Reconfirming an already paid checkout session is idempotent and does not grant credits twice.
+- Signed billing webhooks are verified with `KERISLAB_BILLING_WEBHOOK_SECRET`, stored as provider events, and processed idempotently by provider event ID.
 
 ## 6. Event Stream
 
@@ -203,7 +228,11 @@ The UI must be able to reconnect and request events after the last seen `sequenc
 ## 7. Security and Policy
 
 - Production access requires Google OAuth or configured enterprise SSO.
-- Workspace membership and role are checked on every project, target, scan, finding, report, settings, and credit endpoint.
+- API clients authenticate with persisted bearer-token sessions; logout revokes the session token.
+- Workspace Owner/Admin users configure allowed SSO email domains; matching Google/SSO identities auto-join as Developer members.
+- Workspace membership is checked on every project, target, scan, finding, report, event, audit, and credit endpoint.
+- Owner/Admin roles are required for manual credit grants and billing checkout confirmation.
+- Owner/Admin/Security Lead roles are required for model provider profile management.
 - Resolve DNS and validate IP before every network action.
 - Re-check scope after redirects.
 - All tool execution goes through policy.

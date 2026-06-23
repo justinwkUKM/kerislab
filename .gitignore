@@ -9,6 +9,8 @@ node_modules/
 dist/
 build/
 *.tsbuildinfo
+.kerislab/
+backups/
 .DS_Store
 .env
 .env.*

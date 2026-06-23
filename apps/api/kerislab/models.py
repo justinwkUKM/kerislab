@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from typing import Any
 from uuid import uuid4
@@ -13,6 +13,10 @@ def new_id(prefix: str) -> str:
 
 def now_utc() -> datetime:
     return datetime.now(UTC)
+
+
+def session_expires_at() -> datetime:
+    return now_utc() + timedelta(days=30)
 
 
 class Role(StrEnum):
@@ -47,6 +51,74 @@ class ScanStatus(StrEnum):
     FAILED = "failed"
     CANCELLED = "cancelled"
     BLOCKED = "blocked"
+
+
+class ScanJobType(StrEnum):
+    PASSIVE_SCAN = "passive_scan"
+    AUTONOMOUS_START = "autonomous_start"
+    APPROVAL_REQUEST = "approval_request"
+    COMPLETE_SCAN = "complete_scan"
+    FAIL_SCAN = "fail_scan"
+
+
+class ScanJobStatus(StrEnum):
+    QUEUED = "queued"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class BrowserExecutionStatus(StrEnum):
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class BillingProvider(StrEnum):
+    MANUAL = "manual"
+    STRIPE = "stripe"
+
+
+class CheckoutSessionStatus(StrEnum):
+    CREATED = "created"
+    PAID = "paid"
+    CANCELLED = "cancelled"
+
+
+class InvoiceStatus(StrEnum):
+    OPEN = "open"
+    PAID = "paid"
+    VOID = "void"
+
+
+class PaymentStatus(StrEnum):
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+
+
+class AuditAction(StrEnum):
+    LOGIN = "login"
+    OAUTH_STATE_CREATED = "oauth_state_created"
+    OAUTH_STATE_CONSUMED = "oauth_state_consumed"
+    WORKSPACE_CREATED = "workspace_created"
+    WORKSPACE_SSO_UPDATED = "workspace_sso_updated"
+    WORKSPACE_MEMBER_AUTO_JOINED = "workspace_member_auto_joined"
+    PROJECT_CREATED = "project_created"
+    TARGET_CREATED = "target_created"
+    MODEL_PROFILE_CREATED = "model_profile_created"
+    MODEL_PROFILE_TESTED = "model_profile_tested"
+    SCAN_CREATED = "scan_created"
+    SCAN_EXECUTED = "scan_executed"
+    SCAN_PAUSED = "scan_paused"
+    SCAN_RESUMED = "scan_resumed"
+    SCAN_INSTRUCTIONS_UPDATED = "scan_instructions_updated"
+    APPROVAL_REQUESTED = "approval_requested"
+    APPROVAL_RESOLVED = "approval_resolved"
+    REPORT_GENERATED = "report_generated"
+    CREDITS_GRANTED = "credits_granted"
+    BILLING_CHECKOUT_CREATED = "billing_checkout_created"
+    BILLING_CHECKOUT_CONFIRMED = "billing_checkout_confirmed"
+    SETTINGS_UPDATED = "settings_updated"
 
 
 class CreditReservationStatus(StrEnum):
@@ -119,6 +191,31 @@ class UserSettings:
 
 
 @dataclass
+class UserSession:
+    user_id: str
+    token: str
+    auth_provider: AuthProvider
+    user_agent: str | None = None
+    ip_address: str | None = None
+    id: str = field(default_factory=lambda: new_id("ses"))
+    created_at: datetime = field(default_factory=now_utc)
+    expires_at: datetime = field(default_factory=session_expires_at)
+    revoked_at: datetime | None = None
+    last_seen_at: datetime | None = None
+
+
+@dataclass
+class OAuthState:
+    provider: AuthProvider
+    state: str
+    nonce: str
+    redirect_uri: str
+    consumed_at: datetime | None = None
+    id: str = field(default_factory=lambda: new_id("oas"))
+    created_at: datetime = field(default_factory=now_utc)
+
+
+@dataclass
 class Workspace:
     name: str
     allowed_domains: list[str] = field(default_factory=list)
@@ -161,6 +258,71 @@ class CreditReservation:
     status: CreditReservationStatus = CreditReservationStatus.RESERVED
     id: str = field(default_factory=lambda: new_id("crr"))
     created_at: datetime = field(default_factory=now_utc)
+
+
+@dataclass
+class BillingCustomer:
+    workspace_id: str
+    provider: BillingProvider
+    provider_customer_id: str
+    billing_email: str
+    id: str = field(default_factory=lambda: new_id("bilcus"))
+    created_at: datetime = field(default_factory=now_utc)
+
+
+@dataclass
+class BillingCheckoutSession:
+    workspace_id: str
+    provider: BillingProvider
+    credit_amount: int
+    unit_amount_cents: int
+    currency: str = "USD"
+    status: CheckoutSessionStatus = CheckoutSessionStatus.CREATED
+    provider_session_id: str | None = None
+    checkout_url: str | None = None
+    id: str = field(default_factory=lambda: new_id("bilchk"))
+    created_at: datetime = field(default_factory=now_utc)
+    completed_at: datetime | None = None
+
+
+@dataclass
+class BillingInvoice:
+    workspace_id: str
+    checkout_session_id: str
+    provider: BillingProvider
+    amount_cents: int
+    currency: str
+    status: InvoiceStatus = InvoiceStatus.OPEN
+    provider_invoice_id: str | None = None
+    id: str = field(default_factory=lambda: new_id("bilinv"))
+    created_at: datetime = field(default_factory=now_utc)
+    paid_at: datetime | None = None
+
+
+@dataclass
+class BillingPayment:
+    workspace_id: str
+    invoice_id: str
+    provider: BillingProvider
+    amount_cents: int
+    currency: str
+    status: PaymentStatus
+    provider_payment_id: str | None = None
+    id: str = field(default_factory=lambda: new_id("bilpay"))
+    created_at: datetime = field(default_factory=now_utc)
+
+
+@dataclass
+class BillingWebhookEvent:
+    provider: BillingProvider
+    provider_event_id: str
+    event_type: str
+    payload: dict[str, Any]
+    processed: bool = False
+    error: str = ""
+    id: str = field(default_factory=lambda: new_id("bilwh"))
+    received_at: datetime = field(default_factory=now_utc)
+    processed_at: datetime | None = None
 
 
 @dataclass
@@ -241,6 +403,34 @@ class BrowserPlan:
 
 
 @dataclass
+class BrowserExecution:
+    scan_id: str
+    browser_plan_id: str
+    engine: str
+    status: BrowserExecutionStatus = BrowserExecutionStatus.RUNNING
+    result: dict[str, Any] = field(default_factory=dict)
+    error: str = ""
+    id: str = field(default_factory=lambda: new_id("bex"))
+    started_at: datetime = field(default_factory=now_utc)
+    completed_at: datetime | None = None
+
+
+@dataclass
+class EvidenceArtifact:
+    scan_id: str
+    artifact_type: str
+    uri: str
+    summary: str
+    content_type: str
+    content: str = ""
+    browser_execution_id: str | None = None
+    finding_id: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+    id: str = field(default_factory=lambda: new_id("evd"))
+    created_at: datetime = field(default_factory=now_utc)
+
+
+@dataclass
 class ApprovalRequest:
     workspace_id: str
     scan_id: str
@@ -283,3 +473,44 @@ class Report:
     content: dict[str, Any]
     id: str = field(default_factory=lambda: new_id("rpt"))
     created_at: datetime = field(default_factory=now_utc)
+
+
+@dataclass
+class ScanJob:
+    scan_id: str
+    job_type: ScanJobType
+    status: ScanJobStatus = ScanJobStatus.QUEUED
+    payload: dict[str, Any] = field(default_factory=dict)
+    attempts: int = 0
+    id: str = field(default_factory=lambda: new_id("job"))
+    created_at: datetime = field(default_factory=now_utc)
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
+    error: str = ""
+
+
+@dataclass
+class AuditLog:
+    action: AuditAction | str
+    actor_user_id: str | None
+    workspace_id: str | None = None
+    project_id: str | None = None
+    target_id: str | None = None
+    scan_id: str | None = None
+    approval_id: str | None = None
+    report_id: str | None = None
+    details: dict[str, Any] = field(default_factory=dict)
+    id: str = field(default_factory=lambda: new_id("aud"))
+    created_at: datetime = field(default_factory=now_utc)
+
+
+@dataclass
+class WorkerHeartbeat:
+    name: str
+    queue_name: str
+    status: str = "running"
+    processed_jobs: int = 0
+    error: str = ""
+    id: str = field(default_factory=lambda: new_id("wrk"))
+    started_at: datetime = field(default_factory=now_utc)
+    last_seen_at: datetime = field(default_factory=now_utc)

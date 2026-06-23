@@ -1,29 +1,187 @@
+name: kerislab
+
 services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${KERISLAB_POSTGRES_DB:-kerislab}
+      POSTGRES_USER: ${KERISLAB_POSTGRES_USER:-kerislab}
+      POSTGRES_PASSWORD: ${KERISLAB_POSTGRES_PASSWORD:-kerislab_change_me}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    restart: unless-stopped
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${KERISLAB_MINIO_ROOT_USER:-kerislab}
+      MINIO_ROOT_PASSWORD: ${KERISLAB_MINIO_ROOT_PASSWORD:-kerislab_change_me}
+    volumes:
+      - minio-data:/data
+    ports:
+      - "${KERISLAB_MINIO_PORT:-9000}:9000"
+      - "${KERISLAB_MINIO_CONSOLE_PORT:-9001}:9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  minio-init:
+    image: minio/mc:RELEASE.2025-04-16T18-13-26Z
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        mc alias set kerislab http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD" &&
+        mc mb --ignore-existing kerislab/"$$KERISLAB_OBJECT_STORAGE_BUCKET" &&
+        mc anonymous set none kerislab/"$$KERISLAB_OBJECT_STORAGE_BUCKET"
+    environment:
+      MINIO_ROOT_USER: ${KERISLAB_MINIO_ROOT_USER:-kerislab}
+      MINIO_ROOT_PASSWORD: ${KERISLAB_MINIO_ROOT_PASSWORD:-kerislab_change_me}
+      KERISLAB_OBJECT_STORAGE_BUCKET: ${KERISLAB_OBJECT_STORAGE_BUCKET:-kerislab-evidence}
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    restart: unless-stopped
+    command: ["--host", "0.0.0.0", "--port", "4000"]
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-kerislab-local}
+      DATABASE_URL: postgresql://${KERISLAB_POSTGRES_USER:-kerislab}:${KERISLAB_POSTGRES_PASSWORD:-kerislab_change_me}@postgres:5432/${KERISLAB_POSTGRES_DB:-kerislab}
+    ports:
+      - "${KERISLAB_LITELLM_PORT:-4000}:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/health/liveliness', timeout=3)\" || python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/health', timeout=3)\"",
+        ]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+
   api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
     environment:
-      KERISLAB_AUTH_MODE: development
+      KERISLAB_DATABASE_URL: postgresql://${KERISLAB_POSTGRES_USER:-kerislab}:${KERISLAB_POSTGRES_PASSWORD:-kerislab_change_me}@postgres:5432/${KERISLAB_POSTGRES_DB:-kerislab}
+      KERISLAB_REDIS_URL: redis://redis:6379/0
+      KERISLAB_REDIS_QUEUE: ${KERISLAB_REDIS_QUEUE:-kerislab:scan-jobs}
+      KERISLAB_WORKER_NAME: ${KERISLAB_WORKER_NAME:-kerislab-compose-worker}
+      KERISLAB_OBJECT_STORAGE_ENDPOINT: http://minio:9000
+      KERISLAB_OBJECT_STORAGE_BUCKET: ${KERISLAB_OBJECT_STORAGE_BUCKET:-kerislab-evidence}
+      KERISLAB_OBJECT_STORAGE_ACCESS_KEY: ${KERISLAB_MINIO_ROOT_USER:-kerislab}
+      KERISLAB_OBJECT_STORAGE_SECRET_KEY: ${KERISLAB_MINIO_ROOT_PASSWORD:-kerislab_change_me}
+      KERISLAB_EVIDENCE_LOCAL_PATH: /app/.kerislab/evidence
       KERISLAB_LITELLM_BASE_URL: http://litellm:4000
+      KERISLAB_BACKGROUND_WORKER: "0"
+      KERISLAB_BILLING_WEBHOOK_SECRET: ${KERISLAB_BILLING_WEBHOOK_SECRET:-kerislab-webhook-secret}
+      KERISLAB_GOOGLE_CLIENT_ID: ${KERISLAB_GOOGLE_CLIENT_ID:-}
+      KERISLAB_GOOGLE_CLIENT_SECRET: ${KERISLAB_GOOGLE_CLIENT_SECRET:-}
+      KERISLAB_GOOGLE_REDIRECT_URI: ${KERISLAB_GOOGLE_REDIRECT_URI:-http://localhost:5173/api/auth/oidc/callback}
+      KERISLAB_SSO_CLIENT_ID: ${KERISLAB_SSO_CLIENT_ID:-}
+      KERISLAB_SSO_CLIENT_SECRET: ${KERISLAB_SSO_CLIENT_SECRET:-}
+      KERISLAB_SSO_AUTHORIZE_URL: ${KERISLAB_SSO_AUTHORIZE_URL:-}
+      KERISLAB_SSO_TOKEN_URL: ${KERISLAB_SSO_TOKEN_URL:-}
+      KERISLAB_SSO_REDIRECT_URI: ${KERISLAB_SSO_REDIRECT_URI:-http://localhost:5173/api/auth/oidc/callback}
+      KERISLAB_SSO_USERINFO_URL: ${KERISLAB_SSO_USERINFO_URL:-}
+      KERISLAB_SSO_ISSUER_URLS: ${KERISLAB_SSO_ISSUER_URLS:-}
     ports:
-      - "8000:8000"
+      - "${KERISLAB_API_PORT:-8000}:8000"
     depends_on:
-      - litellm
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      litellm:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    command: ["python", "-m", "kerislab.worker"]
+    environment:
+      KERISLAB_DATABASE_URL: postgresql://${KERISLAB_POSTGRES_USER:-kerislab}:${KERISLAB_POSTGRES_PASSWORD:-kerislab_change_me}@postgres:5432/${KERISLAB_POSTGRES_DB:-kerislab}
+      KERISLAB_REDIS_URL: redis://redis:6379/0
+      KERISLAB_REDIS_QUEUE: ${KERISLAB_REDIS_QUEUE:-kerislab:scan-jobs}
+      KERISLAB_OBJECT_STORAGE_ENDPOINT: http://minio:9000
+      KERISLAB_OBJECT_STORAGE_BUCKET: ${KERISLAB_OBJECT_STORAGE_BUCKET:-kerislab-evidence}
+      KERISLAB_OBJECT_STORAGE_ACCESS_KEY: ${KERISLAB_MINIO_ROOT_USER:-kerislab}
+      KERISLAB_OBJECT_STORAGE_SECRET_KEY: ${KERISLAB_MINIO_ROOT_PASSWORD:-kerislab_change_me}
+      KERISLAB_EVIDENCE_LOCAL_PATH: /app/.kerislab/evidence
+      KERISLAB_LITELLM_BASE_URL: http://litellm:4000
+      KERISLAB_WORKER_ID: ${KERISLAB_WORKER_ID:-kerislab-compose-worker-1}
+      KERISLAB_WORKER_NAME: ${KERISLAB_WORKER_NAME:-kerislab-compose-worker}
+      KERISLAB_WORKER_POLL_INTERVAL: ${KERISLAB_WORKER_POLL_INTERVAL:-2.0}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import os; from datetime import timedelta; from kerislab.models import now_utc; from kerislab.store import create_store; store = create_store(); store.reload(); hb = store.worker_heartbeats.get(os.environ['KERISLAB_WORKER_ID']); raise SystemExit(0 if hb and hb.status == 'running' and hb.last_seen_at >= now_utc() - timedelta(seconds=90) else 1)\"",
+        ]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 5
 
   web:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
-    environment:
-      VITE_API_BASE_URL: http://localhost:8000
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
+    restart: unless-stopped
     ports:
-      - "5173:5173"
+      - "${KERISLAB_WEB_PORT:-5173}:80"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
-  litellm:
-    image: ghcr.io/berriai/litellm:main-latest
-    command: ["--host", "0.0.0.0", "--port", "4000"]
-    ports:
-      - "4000:4000"
+volumes:
+  postgres-data:
+  redis-data:
+  minio-data:
