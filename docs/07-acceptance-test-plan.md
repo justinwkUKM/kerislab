@@ -2,7 +2,7 @@
 
 ## 1. Release Gates
 
-MVP is acceptable when:
+The current platform foundation is acceptable when:
 
 - A user can sign in with Google or configured enterprise SSO.
 - A user can view/update profile and settings.
@@ -12,11 +12,20 @@ MVP is acceptable when:
 - A user can start an autonomous blackbox scan with guarded defaults.
 - Starting the scan reserves one workspace credit.
 - Completing the scan deducts one credit.
-- Mission Control streams live events and can reconnect.
+- Mission Control polls persisted events and restores active scan context after refresh.
 - Safe actions execute automatically inside scope.
 - Gated actions require approval before execution.
 - Findings are evidence-backed and persisted.
-- JSON and Markdown reports generate from saved findings.
+- JSON reports generate from saved findings and can be downloaded.
+- Docker Compose starts web, API, worker, PostgreSQL, Redis, MinIO, and LiteLLM with health checks.
+
+Upcoming release gates:
+
+- WebSocket or SSE event delivery for lower-latency Mission Control updates.
+- Markdown, PDF, and SARIF report formats.
+- Whitebox repository ingestion and deterministic scanner integrations.
+- Production identity-provider management UI.
+- Stronger per-scan worker isolation and multi-worker scheduling controls.
 
 ## 2. Functional Tests
 
@@ -83,7 +92,8 @@ Findings:
 Reports:
 
 - Generate JSON report.
-- Generate Markdown report.
+- Download generated JSON report.
+- Generate Markdown report as an upcoming report-format feature.
 - Regenerate report without rerunning scan.
 
 ## 3. Security Tests
@@ -140,7 +150,7 @@ Mission Control:
 - Shows findings and evidence.
 - Pause/resume/cancel controls update state.
 - Approval modal supports keyboard use.
-- Reconnect loads historical events.
+- Refresh restores local mission context and reloads historical events.
 
 Accessibility:
 
@@ -152,7 +162,7 @@ Accessibility:
 ## 5. Integration Tests
 
 - API creates scan job and worker consumes it.
-- Worker writes scan events and UI receives them.
+- Worker writes scan events and UI receives them through polling.
 - Worker calls LiteLLM through configured profile.
 - Tool Gateway stores evidence artifacts and links them to findings.
 - Approval request pauses gated action until resolution.
@@ -163,7 +173,7 @@ Accessibility:
 - Run 10 concurrent passive scans.
 - Run 3 concurrent autonomous scans.
 - Restart worker mid-scan and confirm scan resumes or fails clearly.
-- Disconnect UI and reconnect event stream.
+- Refresh UI and confirm persisted events are reloaded.
 - Simulate LiteLLM timeout and confirm scan pauses with clear error.
 - Simulate browser crash and confirm one retry plus persisted failure if retry fails.
 

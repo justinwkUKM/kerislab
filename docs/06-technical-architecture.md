@@ -22,16 +22,18 @@ React Web UI
 Web:
 
 - React, TypeScript, Vite.
-- TanStack Query for API state.
-- WebSocket or SSE client for scan events.
+- Plain React state with a typed API client for the current web app.
+- Local session restore with `localStorage` for active user/workspace/scan context.
+- Polling for runtime health, credits, scan events, approvals, findings, and evidence.
 - Apple-inspired design system implemented as CSS variables and reusable components.
+- Command search, findings filtering, evidence actions, and report download affordances.
 
 API:
 
 - FastAPI.
 - Google OAuth, enterprise SSO, one-time OAuth state records, userinfo/id-token profile resolution, id-token nonce/audience/issuer validation, allowed-domain workspace auto-join, sessions, profile/settings, workspace membership, credits, projects, targets, scans, findings, reports, settings, audit logs.
 - Creates scan jobs and reads persisted scan state.
-- Streams scan events.
+- Persists scan events and exposes them through polling endpoints. WebSocket/SSE event streaming is an upcoming scale feature.
 
 Worker:
 
@@ -55,15 +57,15 @@ PostgreSQL:
 
 SQLite:
 
-- Local fallback database for single-node development and offline MVP runs.
+- Local fallback database for single-node development and offline runs.
 - Stores the same serialized platform state as PostgreSQL when no Postgres URL is available or the Postgres connection fails.
 - Normalized schema migrations are applied before the SQLite-backed store opens.
 - If SQLite cannot be initialized, the API falls back to in-memory storage for emergency development and test runs.
 
 Object Storage:
 
-- Local filesystem for MVP.
-- S3-compatible storage for scale.
+- Local filesystem fallback for development.
+- S3-compatible storage for deployment, including MinIO in Docker Compose.
 - Stores screenshots, transcripts, logs, source snippets, report files, and scanner artifacts.
 
 ## 3. Core Data Entities
@@ -110,19 +112,23 @@ Object Storage:
 Auth and profile:
 
 - `GET /api/auth/providers`
+- `GET /api/auth/google/login`
+- `GET /api/auth/sso/login`
+- `GET /api/auth/oidc/callback`
+- `POST /api/auth/oidc/callback`
+- `POST /api/auth/dev-login`
 - `GET /api/auth/me`
 - `POST /api/auth/logout`
-- `GET /api/users/me`
 - `PATCH /api/users/me`
 
 Workspaces:
 
+- `POST /api/workspaces`
 - `GET /api/workspaces`
 - `GET /api/workspaces/{workspace_id}`
-- `GET /api/workspaces/{workspace_id}/members`
-- `POST /api/workspaces/{workspace_id}/members/invite`
 - `PATCH /api/workspaces/{workspace_id}/sso`
 - `GET /api/workspaces/{workspace_id}/credits`
+- `POST /api/workspaces/{workspace_id}/credits/grant`
 - `GET /api/workspaces/{workspace_id}/credit-ledger`
 - `POST /api/workspaces/{workspace_id}/billing/checkout-sessions`
 - `POST /api/billing/checkout-sessions/{checkout_session_id}/confirm`
@@ -132,19 +138,29 @@ Projects and targets:
 
 - `POST /api/projects`
 - `GET /api/projects`
-- `POST /api/projects/{project_id}/targets`
 - `GET /api/projects/{project_id}/targets`
+- `POST /api/targets`
 
 Scans:
 
 - `POST /api/scans`
 - `GET /api/scans/{scan_id}`
 - `GET /api/scans/{scan_id}/events`
+- `GET /api/execution/jobs`
+- `GET /api/audit-logs`
+- `POST /api/execution/drain`
+- `POST /api/scans/{scan_id}/run-passive`
 - `POST /api/scans/{scan_id}/pause`
 - `POST /api/scans/{scan_id}/resume`
 - `POST /api/scans/{scan_id}/cancel`
 - `POST /api/scans/{scan_id}/instructions`
+- `POST /api/scans/{scan_id}/complete`
+- `POST /api/scans/{scan_id}/fail`
+- `POST /api/scans/{scan_id}/start-autonomous`
+- `GET /api/scans/{scan_id}/browser-plan`
+- `POST /api/scans/{scan_id}/browser-plan/execute`
 - `GET /api/scans/{scan_id}/evidence`
+- `POST /api/scans/{scan_id}/approvals/request-upload-verification`
 
 Approvals:
 
@@ -156,17 +172,13 @@ Findings and reports:
 
 - `GET /api/findings`
 - `GET /api/findings/{finding_id}`
-- `PATCH /api/findings/{finding_id}`
 - `POST /api/reports`
 - `GET /api/reports/{report_id}/download`
 
 Settings:
 
-- `GET /api/settings/llm/profiles`
 - `POST /api/settings/llm/profiles`
 - `POST /api/settings/llm/profiles/{profile_id}/test`
-- `GET /api/settings/policies`
-- `PATCH /api/settings/policies/{policy_id}`
 
 ## 5. Scan Creation Contract
 
@@ -207,23 +219,20 @@ Credit behavior:
 - Reconfirming an already paid checkout session is idempotent and does not grant credits twice.
 - Signed billing webhooks are verified with `KERISLAB_BILLING_WEBHOOK_SECRET`, stored as provider events, and processed idempotently by provider event ID.
 
-## 6. Event Stream
+## 6. Event Delivery
 
-Use append-only persisted events and stream them live to the UI.
+Use append-only persisted events and expose them to the UI. The current web app polls `GET /api/scans/{scan_id}/events` and refreshes related scan state. WebSocket or SSE delivery is an upcoming scale feature for lower-latency Mission Control updates.
 
 Event envelope:
 
 - `id`
 - `scan_id`
-- `sequence`
-- `timestamp`
 - `type`
-- `actor`
-- `severity`
 - `summary`
 - `payload`
+- `created_at`
 
-The UI must be able to reconnect and request events after the last seen `sequence`.
+The UI restores the active mission from local storage and reloads historical events from the API after refresh.
 
 ## 7. Security and Policy
 

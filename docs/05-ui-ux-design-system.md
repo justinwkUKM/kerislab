@@ -78,7 +78,7 @@ Login:
 - Apple-inspired light-first sign-in screen.
 - Primary action: Continue with Google.
 - Secondary action: Continue with SSO when workspace SSO is configured.
-- Minimal copy, centered composition, no marketing hero, no password form in MVP.
+- Minimal copy, centered composition, no marketing hero, no password form.
 - Error states for blocked domain, missing invite, disabled workspace, and SSO failure.
 
 Dashboard:

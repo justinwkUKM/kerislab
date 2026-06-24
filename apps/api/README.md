@@ -1,6 +1,6 @@
-# KerisLab API MVP
+# KerisLab API
 
-This is the first backend slice of KerisLab. It provides the domain model and FastAPI entrypoints for:
+This is the FastAPI backend for KerisLab. It provides the domain model, persistence layer, and API entrypoints for:
 
 - Google OAuth and enterprise SSO initiation/callback endpoints with one-time OAuth state records, userinfo lookup, and id-token nonce/audience/issuer validation.
 - Persisted bearer-token sessions with logout revocation.
@@ -47,6 +47,20 @@ Billing webhook runtime configuration:
 - `KERISLAB_BILLING_WEBHOOK_SECRET`
 - Webhook calls must send `X-KerisLab-Signature` as an HMAC-SHA256 over canonical JSON payload.
 - Webhook event IDs are stored and processed idempotently.
+
+Storage and worker runtime configuration:
+
+- `KERISLAB_DATABASE_URL`: PostgreSQL connection URL. The API falls back to SQLite and then in-memory storage if persistence cannot initialize.
+- `KERISLAB_REDIS_URL`: optional Redis connection used for scan-job notifications.
+- `KERISLAB_REDIS_QUEUE`: Redis queue name, default `kerislab:scan-jobs`.
+- `KERISLAB_OBJECT_STORAGE_ENDPOINT`: optional S3-compatible endpoint such as MinIO.
+- `KERISLAB_OBJECT_STORAGE_BUCKET`: evidence bucket, default `kerislab-evidence`.
+- `KERISLAB_OBJECT_STORAGE_ACCESS_KEY`
+- `KERISLAB_OBJECT_STORAGE_SECRET_KEY`
+- `KERISLAB_EVIDENCE_LOCAL_PATH`: local evidence fallback path, default `.kerislab/evidence`.
+- `KERISLAB_WORKER_ID`, `KERISLAB_WORKER_NAME`, and `KERISLAB_WORKER_POLL_INTERVAL`: background worker identity and polling configuration.
+
+The Docker Compose defaults are documented in the root `.env.example` and [deployment guide](../../docs/08-docker-compose-deployment.md).
 
 The core service layer is dependency-light and covered by pytest/unittest-compatible tests. FastAPI is used for the runtime API surface.
 

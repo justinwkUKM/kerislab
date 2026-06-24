@@ -73,7 +73,7 @@ KerisLab is a self-hosted AI security testing platform for guarded autonomous pe
 - Agent creates a plan with phases and objectives.
 - Safe actions run automatically.
 - Risky actions produce approval requests.
-- Mission Control streams phase status, plan changes, browser snapshots, tool calls, approvals, findings, and evidence.
+- Mission Control displays phase status, plan changes, browser snapshots, tool calls, approvals, findings, and evidence from persisted scan state.
 - Operator can pause, resume, cancel, approve, reject, or add instructions.
 
 ### 4.5 Whitebox Testing
@@ -101,9 +101,9 @@ KerisLab is a self-hosted AI security testing platform for guarded autonomous pe
 ### 4.8 Reports
 
 - Generate JSON reports for automation.
-- Generate Markdown reports for review.
-- Generate PDF reports for delivery.
-- Generate SARIF for whitebox/code findings.
+- Generate Markdown reports for review as an upcoming report-format feature.
+- Generate PDF reports for delivery as an upcoming report-format feature.
+- Generate SARIF for whitebox/code findings as an upcoming report-format feature.
 - Reports must be generated from stored findings and evidence.
 
 ### 4.9 LiteLLM Settings
@@ -122,7 +122,7 @@ KerisLab is a self-hosted AI security testing platform for guarded autonomous pe
 - Accessibility: all main workflows must be keyboard accessible and meet WCAG AA contrast.
 - Usability: the UI should remain calm under scan noise by grouping events and surfacing decisions.
 
-## 6. MVP Release Criteria
+## 6. Platform Release Criteria
 
 - Sign in with Google OAuth or configured enterprise SSO.
 - View and update user profile/settings.
@@ -132,9 +132,10 @@ KerisLab is a self-hosted AI security testing platform for guarded autonomous pe
 - Configure LiteLLM profile and verify model call.
 - Reserve one credit when starting a scan.
 - Start autonomous blackbox pentest with guarded defaults.
-- Stream Mission Control events.
+- Poll and display Mission Control events, with WebSocket/SSE streaming as an upcoming scale enhancement.
 - Run safe recon, crawl, and low-risk HTTP/browser tests.
 - Gate risky actions with approval requests.
 - Persist evidence-backed findings.
 - Deduct one credit when the scan completes successfully or release it if the scan fails/cancels.
-- Export JSON and Markdown report.
+- Export JSON reports.
+- Add Markdown, PDF, and SARIF report exports in upcoming report-format milestones.

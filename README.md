@@ -28,11 +28,11 @@ KerisLab is built as a control surface, not just a scanner.
 - Developers who need clear findings, evidence, and remediation context.
 - Operators who need workspace-level credit control and auditability.
 
-## Current MVP Scope
+## Current Platform Capabilities
 
 This repository currently includes:
 
-- FastAPI backend with in-memory MVP storage.
+- FastAPI backend with Postgres-first persistence, SQLite fallback, and in-memory emergency fallback.
 - React + TypeScript + Vite frontend.
 - Credit reservation and deduction flow.
 - User profile and settings endpoints.
@@ -41,7 +41,9 @@ This repository currently includes:
 - Normalized SQL migration artifacts for the production relational schema.
 - Scan execution queue with Redis notifications, durable database fallback, and a worker loop for background processing.
 - API-backed autonomous scan planning.
-- Browser/UI-driven autonomous scan planning.
+- Browser/UI-driven autonomous scan planning and persisted browser execution records.
+- Evidence metadata persistence with local filesystem or S3-compatible object storage.
+- Docker Compose deployment for web, API, worker, PostgreSQL, Redis, MinIO, and LiteLLM.
 - Tests for the main API and service behavior.
 
 ## Local Verification
@@ -70,7 +72,7 @@ make run-web
 Or start the full Compose stack:
 
 ```bash
-docker compose up --build
+make compose-up
 ```
 
 Web: `http://localhost:5173`
@@ -98,6 +100,6 @@ The implemented platform foundation now covers OAuth/SSO entrypoints, allowed-do
 
 - Hosted identity provider management UI and enterprise SSO rollout workflows.
 - Horizontally scaled worker pools with stronger isolation and scheduling controls.
-- Evidence object storage for browser screenshots, transcripts, and scanner artifacts.
+- Evidence lifecycle, retention, indexing, and large-scale object-storage operations.
 - Hosted billing provider adapters for provider-specific checkout creation and customer portal flows.
 - Deployment hardening for multi-tenant production environments.
